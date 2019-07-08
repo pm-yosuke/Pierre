@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CouponMasterStorage.md</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <style>
+        body {
+            font: 400 16px/24px Roboto, sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            overflow: hidden;
+            padding: 0;
+            text-overflow: ellipsis;
+            font-family: Google Sans, sans-serif;
+            font-weight: 400;
+        }
+
+        h1 {
+            color: inherit;
+            font-size: 32px;
+            letter-spacing: 0;
+            margin: 48px 0 24px;
+        }
+
+        h2 {
+            border-bottom: 0;
+            font-size: 22px;
+            letter-spacing: 0;
+            margin: 48px 0 24px;
+            padding-left: 4px;
+            padding-bottom: 0;
+            border-left: 12px solid #009688;
+            border-bottom: 2px solid #009688;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin: 32px 0 16px;
+            padding-left: 8px;
+            border-left: 8px solid #4db6ac;
+        }
+
+        h4 {
+            padding-left: 12px;
+            margin: 32px 0 16px;
+            border-left: 4px solid #b2dfdb;
+            background: #b2dfdb;
+        }
+
+        h5 {
+            color: #004d40;
+        }
+
+        table {
+            border: 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font: 14px Roboto, sans-serif;
+            margin: 16px 0;
+            width: 100%;
+        }
+
+        tr {
+            background: #78909c;
+            border: 0;
+            border-top: 1px solid #cfd8dc;
+        }
+
+        th {
+            color: #fff;
+        }
+
+        td {
+            background: rgba(255, 255, 255, .95);
+            vertical-align: top;
+        }
+
+        pre {
+            font: 14px/20px Roboto Mono, monospace;
+            margin: 16px 0;
+            overflow-x: auto;
+            padding: 8px;
+            position: relative;
+            background: #f7f7f7;
+            color: #37474f;
+        }
+
+        a {
+            color: #00BCd4;
+            text-decoration: none;
+        }
+
+        a:visited {
+            color: #00BCd4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="%E3%82%B3%E3%83%B3%E3%83%88%E3%83%A9%E3%82%AF%E3%83%88-couponmasterstorage">コントラクト CouponMasterStorage</h1>
+    <p>クーポン情報を保持するストレージの管理用コントラクト。
+        直接アクセスされることは考えておらず、実行許可の与えられたアドレスからのみアクセスが可能。
+        RDBにおけるマスタテーブルと考えてもらえれば。</p>
+    <h2 id="%E3%82%B5%E3%83%9E%E3%83%AA">サマリ</h2>
+    <h3 id="%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">フィールド</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">型</th>
+                <th style="text-align:left">フィールド名</th>
+                <th style="text-align:left">概要</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left">struct</td>
+                <td style="text-align:left"><a href="#master">Master</a></td>
+                <td style="text-align:left">クーポンマスタの定義(レコード)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">Master[]</td>
+                <td style="text-align:left"><a href="#masters">_masters</a></td>
+                <td style="text-align:left">クーポンマスタのリスト(テーブル)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">mapping</td>
+                <td style="text-align:left"><a href="#mapusertomaster">_mapUserToMaster</a></td>
+                <td style="text-align:left">(発行)ユーザー→マスターのインデックス</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">address</td>
+                <td style="text-align:left"><a href="#deployer">_deployer</a></td>
+                <td style="text-align:left">本コントラクトをデプロイしたユーザーのアドレス</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">address</td>
+                <td style="text-align:left"><a href="#authaddr">_authAddr</a></td>
+                <td style="text-align:left">実行許可アドレス</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 id="%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF"><a href="#constructor">コンストラクタ</a></h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">修飾子</th>
+                <th style="text-align:left">概要</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left">デプロイしたユーザーの情報を保存する</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 id="%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89">メソッド</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">修飾子</th>
+                <th style="text-align:left">メソッド名</th>
+                <th style="text-align:left">概要</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#auth">auth</a></td>
+                <td style="text-align:left">実行許可アドレスを変更する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getdeployer">getDeployer</a></td>
+                <td style="text-align:left">デプロイしたアドレスを取得する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getauthaddr">getAuthAddr</a></td>
+                <td style="text-align:left">アクセス許可アドレスを取得する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#create">create</a></td>
+                <td style="text-align:left">マスターの作成する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#get">get</a></td>
+                <td style="text-align:left">マスターの取得する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#update">update</a></td>
+                <td style="text-align:left">マスター(レコード)の更新をする</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#deletee">deletee</a></td>
+                <td style="text-align:left">マスターの削除をする</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getmasteridsbyuser">getMasterIdsByUser</a></td>
+                <td style="text-align:left">ユーザーが発行したクーポンのID一覧を取得する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updatecreatoraddress">updateCreatorAddress</a></td>
+                <td style="text-align:left">作成者の更新をする</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updateprice">updatePrice</a></td>
+                <td style="text-align:left">交換レートの更新をする</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updateremainingnumber">updateRemainingNumber</a></td>
+                <td style="text-align:left">配布残枚数の更新をする</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updateadditional">updateAdditional</a></td>
+                <td style="text-align:left">追加情報の更新をする</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#all">all</a></td>
+                <td style="text-align:left">マスターを全件取得する</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2 id="%E8%A9%B3%E7%B4%B0">詳細</h2>
+    <h3 id="%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">フィールド</h3>
+    <h4 id="master">Master</h4>
+    <p>クーポンマスタの1レコード分の定義。</p>
+    <pre class="hljs"><code><div>struct Master {
+    address creatorAddress;
+    uint    price;
+    uint16  remainingNumber;
+    string  additional;
+}
+</div></code></pre>
+    <ul>
+        <li>creatorAddress - 発行者アドレス。クーポンが使用されるとこのアドレス宛にトークンが送信される。</li>
+        <li>price - 交換レート。</li>
+        <li>remainingNumbe - 配布残枚数</li>
+        <li>additional - 追加情報。初版では未使用だが、今後の機能拡張ために用意。JSON文字列を想定。</li>
+    </ul>
+    <h4 id="masters">_masters</h4>
+    <p>クーポンマスタのリストを保持。RDBにおけるテーブルにあたるもの。</p>
+    <pre class="hljs"><code><div>Master[] private _masters
+</div></code></pre>
+    <h4 id="mapusertomaster">_mapUserToMaster</h4>
+    <p>(クーポン発行)ユーザー→マスターを保持する。
+        <a href="#masters">_masters</a>へのインデックス(索引)として使用する。</p>
+    <pre class="hljs"><code><div>mapping(address =&gt; uint[]) private _mapUserToMaster
+</div></code></pre>
+    <h4 id="deployer">_deployer</h4>
+    <p>本コントラクトをデプロイしたユーザーのアドレスを格納。</p>
+    <pre class="hljs"><code><div>address private _deployer
+</div></code></pre>
+    <h4 id="authaddr">_authAddr</h4>
+    <p>本コントラクトを実行できるユーザーまたはコントラクトのアドレスを格納。
+        auth()メソッドを除く全てのメソッドはこのアドレスからの呼出ししか受け付けない。</p>
+    <pre class="hljs"><code><div>address private _authAddr
+</div></code></pre>
+    <h3 id="%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF">コンストラクタ</h3>
+    <h4 id="constructor">constructor()</h4>
+    <p><a href="#deployer">_deployer</a>フィールド及び<a href="#authaddr">_authAddr</a>に呼び出し元アドレス (msg.sender) を格納する。<br>
+        ※ここでの呼び出し元アドレスはデプロイしたユーザーのアドレスとなる。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>constructor() public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h3 id="%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89">メソッド</h3>
+    <h4 id="auth">auth()</h4>
+    <p>実行許可アドレスを変更する。
+        このメソッドのみ、デプロイしたユーザーだけが呼出し可能。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>auth(address addr) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>addr - メソッドの実行を許可するユーザーまたはコントラクトのアドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>デプロイユーザー以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="getdeployer">getDeployer()</h4>
+    <p>本コントラクトをデプロイしたユーザー(アドレス)を取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getDeployer() public view returns(address)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>本コントラクトをデプロイしたアドレス</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <p>なし</p>
+    <h4 id="getauthaddr">getAuthAddr()</h4>
+    <p>本コントラクトへのアクセスを許可されたアドレスを取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getAuthAddr() public view returns(addres)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>本コントラクトへのアクセスを許可したアドレス</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <p>なし</p>
+    <h4 id="create">create()</h4>
+    <p>クーポンマスタのレコードを作成する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>create(
+    address payable creatorAddress,
+    uint            price,
+    uint16          remainingNumber,
+    string memory   additional
+) public returns(uint)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>creatorAddress - 作成者アドレス</li>
+        <li>price - 交換レート</li>
+        <li>remainingNumber - 配布数</li>
+        <li>additional - 追加情報</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>クーポン(マスタ)ID</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="get">get()</h4>
+    <p>クーポンマスタのレコードを取得する</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>get(uint id) public view returns(Master memory) 
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>クーポンマスタ</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="update">update()</h4>
+    <p>クーポンマスタのレコードを更新する。
+        1レコードを一括で更新するので、個別に項目を更新したい場合は後述のupdateXXXメソッドを使用すること。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>update(
+    uint            id,
+    address payable creatorAddress
+    uint            price,
+    uint16          remainingNumber,
+    string memory   additional
+) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+        <li>creatorAddress - 発行者アドレス</li>
+        <li>price - 交換レート</li>
+        <li>remainingNumber - 配布残枚数</li>
+        <li>additional - 追加情報</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="deletee">deletee()</h4>
+    <p>クーポンマスタを削除する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>deletee(uint id) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="getmasteridsbyuser">getMasterIdsByUser()</h4>
+    <p>ユーザーが発行したクーポンのIDの一覧を返す。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getMasterIdsByUser(address creatorAddress) public view return(uint[] memory)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>creatorAddress - 発行者アドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ul>
+        <li>クーポンのID一覧</li>
+    </ul>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updatecreatoraddress">updateCreatorAddress()</h4>
+    <p>発行者アドレスを更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updateCreatorAddress(uint id, address payable creatorAddress) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+        <li>creatorAddress - 発行者アドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updateprice">updatePrice()</h4>
+    <p>交換レートを更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updatePrice(uint id, uint price) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+        <li>price - 交換レート</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updateremainingnumber">updateRemainingNumber()</h4>
+    <p>配布残枚数を更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updateRemainingNumber(uint id, int32 remainingNumber) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+        <li>remainingNumber - 配布残枚数、マイナス値の場合はその分だけ減算する。</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updateadditional">updateAdditional()</h4>
+    <p>追加情報を更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updateAdditional(uint id, string memory additional) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - クーポンID</li>
+        <li>additional - 追加情報</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="all">all()</h4>
+    <p>クーポンマスタを全て取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>all() public view returns(Master[] memory)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>クーポンマスタリスト</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+
+</body>
+
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pierre.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<style>
+body {
+    font: 400 16px/24px Roboto, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    overflow: hidden;
+    padding: 0;
+    text-overflow: ellipsis;
+    font-family: Google Sans, sans-serif;
+    font-weight: 400;
+}
+
+h1 {
+    color: inherit;
+    font-size: 32px;
+    letter-spacing: 0;
+    margin: 48px 0 24px;
+}
+
+h2 {
+    border-bottom: 0;
+    font-size: 22px;
+    letter-spacing: 0;
+    margin: 48px 0 24px;
+    padding-left: 4px;
+    padding-bottom: 0;
+    border-left: 12px solid #009688;
+    border-bottom: 2px solid #009688;
+}
+
+h3 {
+    font-size: 18px;
+    margin: 32px 0 16px;
+    padding-left: 8px;
+    border-left: 8px solid #4db6ac;
+}
+
+h4 {
+    padding-left: 12px;
+    margin: 32px 0 16px;
+    border-left: 4px solid #b2dfdb;
+    background: #b2dfdb;
+}
+
+h5 {
+    color: #004d40;
+}
+
+table {
+    border: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font: 14px Roboto, sans-serif;
+    margin: 16px 0;
+    width: 100%;
+}
+
+tr {
+    background: #78909c;
+    border: 0;
+    border-top: 1px solid #cfd8dc;
+}
+
+th {
+    color: #fff;
+}
+
+td {
+    background: rgba(255, 255, 255, .95);
+    vertical-align: top;
+}
+
+pre {
+    font: 14px/20px Roboto Mono, monospace;
+    margin: 16px 0;
+    overflow-x: auto;
+    padding: 8px;
+    position: relative;
+    background: #f7f7f7;
+    color: #37474f;
+}
+
+a {
+    color: #00BCd4;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #00BCd4;
+}
+
+</style>
+</head>
+<body>
+<h1 id="%E3%82%B3%E3%83%B3%E3%83%88%E3%83%A9%E3%82%AF%E3%83%88-pierren">コントラクト Pierre</h1>
+<p>クーポンシステムのロジックを実装したコントラクト。
+外部からのアクセスは本コントラクトで受けるようにし、別で実装したデータ用コントラクトにアクセスする。
+クーポンの交換で支払われたトークンは本コントラクトでプールする。</p>
+<h2 id="%E3%82%B5%E3%83%9E%E3%83%AA">サマリ</h2>
+<h3 id="%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">フィールド</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">型</th>
+<th style="text-align:left">フィールド名</th>
+<th style="text-align:left">概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CouponMsterStorage</td>
+<td style="text-align:left"><a href="#master">_master</a></td>
+<td style="text-align:left"><a href="./CouponMasterStorage.html">CouponMasterStorage</a>コントラクトのインスタンスを保持する</td>
+</tr>
+<tr>
+<td style="text-align:left">CouponRelationStorage</td>
+<td style="text-align:left"><a href="#relation">_relation</a></td>
+<td style="text-align:left"><a href="./CouponRelationStorage.html">CouponRelationStorage</a>コントラクトのインスタンスを保持する</td>
+</tr>
+</tbody>
+</table>
+<h3 id="%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF"><a href="#constructor">コンストラクタ</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">修飾子</th>
+<th style="text-align:left">概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">public</td>
+<td style="text-align:left"><a href="#master">_master</a>フィールドと<a href="#relation">_relation</a>フィールドを初期化する。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89">メソッド</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">修飾子</th>
+<th style="text-align:left">メソッド名</th>
+<th style="text-align:left">概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">public</td>
+<td style="text-align:left"><a href="#createcoupon">createCoupon</a></td>
+<td style="text-align:left">クーポンを発行する</td>
+</tr>
+<tr>
+<td style="text-align:left">public view</td>
+<td style="text-align:left"><a href="#getcoupon">getCoupon</a></td>
+<td style="text-align:left">クーポンの情報を取得する</td>
+</tr>
+<tr>
+<td style="text-align:left">public</td>
+<td style="text-align:left"><a href="#disablecoupon">disableCoupon</a></td>
+<td style="text-align:left">クーポンの配布を停止する</td>
+</tr>
+<tr>
+<td style="text-align:left">public</td>
+<td style="text-align:left"><a href="#deletecoupon">deleteCoupon</a></td>
+<td style="text-align:left">クーポンを削除する</td>
+</tr>
+<tr>
+<td style="text-align:left">public payable</td>
+<td style="text-align:left"><a href="#exchangecoupon">exchangeCoupon</a></td>
+<td style="text-align:left">クーポンを交換する</td>
+</tr>
+<tr>
+<td style="text-align:left">public</td>
+<td style="text-align:left"><a href="#usecoupon">useCoupon</a></td>
+<td style="text-align:left">クーポンを使用する</td>
+</tr>
+<tr>
+<td style="text-align:left">public view</td>
+<td style="text-align:left"><a href="#getissuedcouponIds">getIssuedCouponIds</a></td>
+<td style="text-align:left">発行したクーポンのID一覧を取得する</td>
+</tr>
+<tr>
+<td style="text-align:left">public view</td>
+<td style="text-align:left"><a href="#getowncouponids">getOwnCouponIds</a></td>
+<td style="text-align:left">所有しているクーポンのID一覧を取得する</td>
+</tr>
+</tbody>
+</table>
+<h2 id="%E8%A9%B3%E7%B4%B0">詳細</h2>
+<h3 id="%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">フィールド</h3>
+<h4 id="master">_master</h4>
+<p><a href="./CouponMasterStorage.html">CouponMasterStorage</a>コントラクトのインスタンスを保持する。<br>
+クーポンのマスタデータに関する操作はこのインスタンス経由で実行する。</p>
+<pre class="hljs"><code><div>CouponMasterStorage public _master
+</div></code></pre>
+<h4 id="relation">_relation</h4>
+<p><a href="./CouponRelationStorage.html">CouponRelationStorage</a>コントラクトのインスタンスを保持する。<br>
+クーポンのリレーションデータに関する操作はこのインスタンス経由で実行する。</p>
+<pre class="hljs"><code><div>CouponRelationStorage public _relation
+</div></code></pre>
+<h3 id="%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF">コンストラクタ</h3>
+<h4 id="constructor">constructor()</h4>
+<p>引数で渡されたアドレスをもとにインスタンスを作成し、それぞれ<a href="#master">_master</a>フィールド、<a href="#relation">_relation</a>フィールドに格納する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>constructor(address masterAddress, address relationAddress) public
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>masterAddress - <a href="./CouponMasterStorage.html">CouponMasterStorage</a>コントラクトのアドレス</li>
+<li>relationAddress - <a href="./CouponRelationStorage.html">CouponRelationStorage</a>コントラクトのアドレス</li>
+</ul>
+<h3 id="%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89">メソッド</h3>
+<h4 id="createcoupon">createCoupon()</h4>
+<p><a href="./CouponMasterStorage.html#create">CouponMasterStorage.create()</a>を実行し、
+クーポンマスタにクーポンを登録する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>createCoupon(
+    uint price, 
+    uint remainingNumber, 
+    string memory additional
+) public returns(uint)
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>price - クーポンの交換レート</li>
+<li>remainingNumber - 配布枚数</li>
+<li>additional - クーポン追加情報</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<ol>
+<li>クーポンID</li>
+</ol>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<ul>
+<li>交換レートが0の場合</li>
+<li>配布枚数が0の場合</li>
+</ul>
+<h4 id="getcoupon">getCoupon()</h4>
+<p><a href="./CouponMasterStorage.html#get">CouponMasterStorage.get()</a>を実行し、
+指定されたクーポンIDをもつクーポンをマスタから取得し返却する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>getCoupon(uint couponId) public view returns(uint, address, uint, uint, string memory)
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>couponId - クーポンID</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<ol>
+<li>クーポンID</li>
+<li>作成者アドレス</li>
+<li>交換レート</li>
+<li>配布残枚数</li>
+<li>クーポン追加情報</li>
+</ol>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<ul>
+<li>クーポンがマスターに存在しない場合</li>
+</ul>
+<h4 id="disablecoupon">disableCoupon()</h4>
+<p><a href="./CouponMasterStorage.html#updateremainingnumber">CouponMasterStorage.updateRemainingNumber()</a>を実行し、
+指定したクーポンIDのクーポンの配布残枚数を0に更新する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>disableCoupon(uint couponId) public
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>couponId - クーポンID</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<p>なし</p>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<ul>
+<li>クーポンがマスターに存在しない場合</li>
+</ul>
+<h4 id="deletecoupon">deleteCoupon()</h4>
+<p><a href="./CouponRelationStorage.html#getrelationsbycoupon">CouponRelationStorage.getRelationsByCoupon()</a>を使用してクーポンを所有しているユーザーを特定、
+未使用の場合に限り所有者にトークンを払い戻す。<br>
+(払い戻すトークン数は<a href="./CouponMasterStorage.html#get">CouponMasterStorage.get()</a>を用いて取得する。)<br>
+<a href="./CouponRelationStorage.html#deletee">CouponRelationStorage.deletee()</a>を実行してリレーションを削除後、
+<a href="./CouponMasterStorage.html#deletee">CouponMasterStorage.deletee()</a>を実行し、クーポンを削除する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>deleteCoupon(uint id) public
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>couponId - クーポンID</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<p>なし</p>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<p>なし(マスターに存在しない場合でも例外は発生させない)</p>
+<h4 id="exchangecoupon">exchangeCoupon()</h4>
+<p>送金されたトークン(msg.value)が<a href="./CouponMasterStorage.html#get">CouponMasterStorage.get()</a>で取得したマスターの交換レート(price)と等しくない場合、処理を終了する。<br>
+過不足ない場合、<a href="./CouponRelationStorage.html#create">CouponRelationStorage.create()</a>を呼出してリレーションを作成、
+<a href="./CouponMasterStorage.html#updateremainingnumber">CouponMasterStorage.updateRemainingNumber</a>で配布残枚数を減算する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>exchangeCoupon(uint couponId) public payable returns(uint)
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>couponId - クーポンID</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<ol>
+<li>リレーションID</li>
+</ol>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<ul>
+<li>クーポンがマスターに存在しない場合</li>
+<li>支払いトークンが交換レートと異なっている場合</li>
+</ul>
+<h4 id="usecoupon">useCoupon()</h4>
+<p><a href="./CouponRelationStorage.html#get">CouponRelationStorage.get()</a>でリレーションを取得する。<br>
+リレーションが存在しない場合や実行者(msg.sender)が所有者(userAddress)でない場合、既に使用済みの場合は処理を終了する。<br>
+<a href="./CouponMasterStorage.html#get">CouponMasterStorage.get()</a>でマスターを取得し、発行者のアドレスを取得する(マスター自体が存在しない場合は処理終了)。<br>
+トークンを送金(<em>&lt;発行者のアドレス&gt;</em>.transfer())後、<a href="./CouponRelationStorage.html#updateisused">CouponRelationStorage.updateIsUsed()</a>でクーポンを使用済みにする。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>useCoupon(uint couponId) public
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>couponId - クーポンID</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<p>なし</p>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<ul>
+<li>リレーションが存在しない場合</li>
+<li>実行者がクーポンの所有者でない場合</li>
+<li>既に使用済みの場合</li>
+<li>クーポンがマスターに存在しない場合</li>
+<li>発行者への支払いトークンが不足している場合</li>
+</ul>
+<h4 id="getissuedcouponids">getIssuedCouponIds()</h4>
+<p>実行者(msg.sender)に紐づくマスターのIDを取得(<a href="./CouponMasterStorage.html#getmasteridsbyuser">CouponMasterStorage.getMasterIdsByUser()</a>)し、返却する。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>getIssuedCouponIds(uint filter) public view returns(uint[] memory)
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>filter - 取得するクーポンIDのフィルター
+<ul>
+<li>0 - 全て(デフォルト)</li>
+<li>1 - 配布残あり</li>
+<li>2 - 配布残なし</li>
+</ul>
+</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<ol>
+<li>クーポンID一覧</li>
+</ol>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<p>なし</p>
+<h4 id="getowncouponids">getOwnCouponIds()</h4>
+<p>実行者(msg.sender)に紐づくリレーションを取得(<a href="./CouponRelationStorage.html#getrelationsbyuser">CouponRelationStorage.getRelationsByUser()</a>)し、
+クーポンIDを配列で返す。</p>
+<h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+<pre class="hljs"><code><div>getOwnCouponIds(uint filter) public view returns(uint[] memory)
+</div></code></pre>
+<h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+<ul>
+<li>filter - 取得するクーポンIDのフィルター
+<ul>
+<li>0 - 全て(デフォルト)</li>
+<li>1 - 未使用</li>
+<li>2 - 使用済み</li>
+</ul>
+</li>
+</ul>
+<h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+<ol>
+<li>クーポンID一覧</li>
+</ol>
+<h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+<p>なし</p>
+
+</body>
+</html>

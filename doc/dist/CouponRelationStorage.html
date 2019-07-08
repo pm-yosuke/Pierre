@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CouponRelationStorage.md</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <style>
+        body {
+            font: 400 16px/24px Roboto, sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            overflow: hidden;
+            padding: 0;
+            text-overflow: ellipsis;
+            font-family: Google Sans, sans-serif;
+            font-weight: 400;
+        }
+
+        h1 {
+            color: inherit;
+            font-size: 32px;
+            letter-spacing: 0;
+            margin: 48px 0 24px;
+        }
+
+        h2 {
+            border-bottom: 0;
+            font-size: 22px;
+            letter-spacing: 0;
+            margin: 48px 0 24px;
+            padding-left: 4px;
+            padding-bottom: 0;
+            border-left: 12px solid #009688;
+            border-bottom: 2px solid #009688;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin: 32px 0 16px;
+            padding-left: 8px;
+            border-left: 8px solid #4db6ac;
+        }
+
+        h4 {
+            padding-left: 12px;
+            margin: 32px 0 16px;
+            border-left: 4px solid #b2dfdb;
+            background: #b2dfdb;
+        }
+
+        h5 {
+            color: #004d40;
+        }
+
+        table {
+            border: 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font: 14px Roboto, sans-serif;
+            margin: 16px 0;
+            width: 100%;
+        }
+
+        tr {
+            background: #78909c;
+            border: 0;
+            border-top: 1px solid #cfd8dc;
+        }
+
+        th {
+            color: #fff;
+        }
+
+        td {
+            background: rgba(255, 255, 255, .95);
+            vertical-align: top;
+        }
+
+        pre {
+            font: 14px/20px Roboto Mono, monospace;
+            margin: 16px 0;
+            overflow-x: auto;
+            padding: 8px;
+            position: relative;
+            background: #f7f7f7;
+            color: #37474f;
+        }
+
+        a {
+            color: #00BCd4;
+            text-decoration: none;
+        }
+
+        a:visited {
+            color: #00BCd4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="%E3%82%B3%E3%83%B3%E3%83%88%E3%83%A9%E3%82%AF%E3%83%88-couponrelationstorage">コントラクト CouponRelationStorage
+    </h1>
+    <p>クーポンの所有情報(クーポン⇔ユーザーのリレーション)を保持するストレージの管理用コントラクト。
+        直接アクセスされることは考えておらず、実行許可の与えられたアドレスからのみアクセスが可能。
+        RDBにおけるトランザクションテーブルと考えてもらえれば。</p>
+    <h2 id="%E3%82%B5%E3%83%9E%E3%83%AA">サマリ</h2>
+    <h3 id="%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">フィールド</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">型</th>
+                <th style="text-align:left">フィールド名</th>
+                <th style="text-align:left">概要</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left">struct</td>
+                <td style="text-align:left"><a href="#relation">Relation</a></td>
+                <td style="text-align:left">リレーションの定義(レコード)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">Relation[]</td>
+                <td style="text-align:left"><a href="#relations">relations</a></td>
+                <td style="text-align:left">リレーションのリスト(テーブル)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">mapping</td>
+                <td style="text-align:left"><a href="#mapusertorelation">_mapUserToRelation</a></td>
+                <td style="text-align:left">ユーザー→リレーションのインデックス</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">mapping</td>
+                <td style="text-align:left"><a href="#mapcoupontorelation">_mapCouponToRelation</a></td>
+                <td style="text-align:left">クーポン→リレーションのインデックス</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">address</td>
+                <td style="text-align:left"><a href="#deployer">_deployer</a></td>
+                <td style="text-align:left">本コントラクトをデプロイしたユーザーのアドレス</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">address</td>
+                <td style="text-align:left"><a href="#authaddr">_authAddr</a></td>
+                <td style="text-align:left">実行許可アドレス</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 id="%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF"><a href="#constructor">コンストラクタ</a></h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">修飾子</th>
+                <th style="text-align:left">概要</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left">デプロイしたユーザーの情報を保存する</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3 id="%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89">メソッド</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">修飾子</th>
+                <th style="text-align:left">メソッド名</th>
+                <th style="text-align:left">概要</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#auth">auth</a></td>
+                <td style="text-align:left">実行許可アドレスを変更する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getdeployer">getDeployer</a></td>
+                <td style="text-align:left">デプロイしたアドレスを取得する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getauthaddr">getAuthAddr</a></td>
+                <td style="text-align:left">アクセス許可アドレスを取得する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#create">create</a></td>
+                <td style="text-align:left">リレーションの作成</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#get">get</a></td>
+                <td style="text-align:left">リレーションの取得</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#update">update</a></td>
+                <td style="text-align:left">リレーションの更新</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#deletee">deletee</a></td>
+                <td style="text-align:left">リレーションの削除</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getrelationidsbyuser">getRelationIdsByUser</a></td>
+                <td style="text-align:left">ユーザーに紐付いたリレーションのIDを取得</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#getrelationidsbycoupon">getRelationIdsByCoupon</a></td>
+                <td style="text-align:left">ユーザーに紐付いたリレーションのIDを取得</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updatecouponid">updateCouponId</a></td>
+                <td style="text-align:left">クーポンIDを更新する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updateuseraddress">updateUserAddress</a></td>
+                <td style="text-align:left">ユーザーアドレスを更新する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public</td>
+                <td style="text-align:left"><a href="#updateisused">updateIsUsed</a></td>
+                <td style="text-align:left">使用済みフラグを更新する</td>
+            </tr>
+            <tr>
+                <td style="text-align:left">public view</td>
+                <td style="text-align:left"><a href="#all">all</a></td>
+                <td style="text-align:left">全件取得</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2 id="%E8%A9%B3%E7%B4%B0">詳細</h2>
+    <h3 id="%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">フィールド</h3>
+    <h4 id="relation">Relation</h4>
+    <p>ユーザー⇔クーポンリレーションの1レコード分の定義</p>
+    <pre class="hljs"><code><div>struct Relation {
+    uint            couponId;
+    address payable userAddress;
+    bool            isUsed;
+}
+</div></code></pre>
+    <ul>
+        <li>couponId - クーポン(マスタ)ID</li>
+        <li>userAddress - クーポンを所有しているユーザーのアドレス</li>
+        <li>isUsed - 使用済みフラグ</li>
+    </ul>
+    <h4 id="relations">_relations</h4>
+    <p>リレーションのリスト。RDBにおけるテーブルにあたるもの。</p>
+    <pre class="hljs"><code><div>Relation[] private _relations
+</div></code></pre>
+    <h4 id="mapusertorelation">_mapUsertoRelation</h4>
+    <p>ユーザー→リレーションを保持する。
+        <a href="#relations">_relations</a>へのインデックス(索引)として使用する。</p>
+    <pre class="hljs"><code><div>mapping(address =&gt; uint[]) private _mapUserToRelation
+</div></code></pre>
+    <h4 id="mapcoupontorelation">_mapCouponToRelation</h4>
+    <p>クーポン→リレーションを保持する。
+        <a href="#relations">_relations</a>へのインデックス(索引)として使用する。</p>
+    <pre class="hljs"><code><div>mapping(uint =&gt; uint[]) private _mapCouponToRelation
+</div></code></pre>
+    <h4 id="deployer">_deployer</h4>
+    <p>本コントラクトをデプロイしたユーザーのアドレスを格納。</p>
+    <pre class="hljs"><code><div>address private _deployer
+</div></code></pre>
+    <h4 id="authaddr">_authAddr</h4>
+    <p>本コントラクトを実行できるユーザーまたはコントラクトのアドレスを格納。
+        auth()メソッドを除く全てのメソッドはこのアドレスからの呼出ししか受け付けない。</p>
+    <pre class="hljs"><code><div>address private _authAddr
+</div></code></pre>
+    <h3 id="%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF">コンストラクタ</h3>
+    <h4 id="constructor">constructor()</h4>
+    <p><a href="#deployer">_deployer</a>フィールド及び<a href="#authaddr">_authAddr</a>に呼び出し元アドレス(msg.sender)を格納する。<br>
+        ※ここでの呼び出し元アドレスはデプロイしたユーザーのアドレスとなる。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>constructor() public
+</div></code></pre>
+    <h3 id="%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89">メソッド</h3>
+    <h4 id="auth">auth()</h4>
+    <p>実行許可アドレスを変更する。
+        このメソッドのみ、デプロイしたユーザーだけが呼出し可能。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>auth(address addr) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>addr - メソッドの実行を許可するユーザーまたはコントラクトのアドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>デプロイユーザー以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="getdeployer">getDeployer()</h4>
+    <p>本コントラクトをデプロイしたユーザー(アドレス)を取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getDeployer() public view returns(address)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>本コントラクトをデプロイしたアドレス</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <p>なし</p>
+    <h4 id="getauthaddr">getAuthAddr()</h4>
+    <p>本コントラクトへのアクセスを許可されたアドレスを取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getAuthAddr() public view returns(addres)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>本コントラクトへのアクセスを許可したアドレス</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <p>なし</p>
+    <h4 id="create">create()</h4>
+    <p>リレーションを作成する。
+        inUsedパラメータ(使用済みフラグ)はfalse(未使用)で登録する。
+        _mapUserToRelation 及び _mapCouponToRelation も併せて登録する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>create(uint couponId, address payable userAddress) public returns(uint)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>couponID - クーポンID</li>
+        <li>userAddress - ユーザーアドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>リレーションID</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="get">get()</h4>
+    <p>リレーションを取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>get(uint id) public view returns(Relation memory) 
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - リレーションID</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>リレーション</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="update">update()</h4>
+    <p>リレーションを更新する</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>update(uint id, uint couponId, address payable userAddress, bool isUsed) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - リレーションID</li>
+        <li>couponId - クーポンID</li>
+        <li>userAddress - ユーザーアドレス</li>
+        <li>isUsed - 使用済みフラグ</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="deletee">deletee()</h4>
+    <p>リレーションを削除する。
+        _mapUserToRelation 及び _mapCouponToRelation からも併せて削除する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>deletee(uint id) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - リレーションID</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="getrelationidsbyuser">getRelationIdsByUser()</h4>
+    <p>ユーザーに紐付いたリレーションのIDを返す。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getRelationIdsByUser(address userAddress) public view returns(uint[])
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>userAddress - ユーザーアドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>引数で指定したアドレスを含むリレーションのID</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="getrelationidsbycoupon">getRelationIdsByCoupon()</h4>
+    <p>クーポンに紐付いたリレーションのIDを返す。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>getRelationIdsByCoupon(uint couponId) public view returns(uint[])
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>couponId - クーポンID</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>引数で指定したクーポンIDを含むリレーションのID</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updatecouponid">updateCouponId()</h4>
+    <p>クーポンIDを更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updateCouponId(uint id, uint couponId) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - リレーションID</li>
+        <li>couponId - クーポンID</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updateuseraddress">updateUserAddress()</h4>
+    <p>ユーザーアドレスを更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updateUserAddress(uint id, address userAddress) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - リレーションID</li>
+        <li>userAddress - ユーザーアドレス</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="updateisused">updateIsUsed()</h4>
+    <p>使用済みフラグを更新する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>updateIsUsed(uint id, bool isUsed) public
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <ul>
+        <li>id - リレーションID</li>
+        <li>isUsed - 使用済みフラグ</li>
+    </ul>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <p>なし</p>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+    <h4 id="all">all()</h4>
+    <p>リレーションを全て取得する。</p>
+    <h5 id="%E5%AE%9A%E7%BE%A9">定義</h5>
+    <pre class="hljs"><code><div>all() public view returns(Relation[] memory)
+</div></code></pre>
+    <h5 id="%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF">パラメータ</h5>
+    <p>なし</p>
+    <h5 id="%E6%88%BB%E3%82%8A%E5%80%A4">戻り値</h5>
+    <ol>
+        <li>リレーションリスト</li>
+    </ol>
+    <h5 id="%E4%BE%8B%E5%A4%96">例外</h5>
+    <ul>
+        <li>実行許可アドレス以外からのアクセスがあった場合</li>
+    </ul>
+
+</body>
+
+</html>
